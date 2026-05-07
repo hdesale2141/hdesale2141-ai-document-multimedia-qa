@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ai_doc_qa}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+openai:
+  api:
+    key: YOUR_API_KEY
+
+
+assemblyai:
+  api:
+    key: YOUR_API_KEY
+file:
+  upload-dir: uploads

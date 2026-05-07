@@ -1,0 +1,13 @@
+# Backend
+ai-doc-qa-backend/target/
+ai-doc-qa-backend/.idea/
+
+# Frontend
+ai-doc-frontend/node_modules/
+ai-doc-frontend/dist/
+ai-doc-frontend/.idea/
+
+# General
+.env
+uploads/
+*.log

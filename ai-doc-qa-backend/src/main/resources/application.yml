@@ -1,0 +1,7 @@
+#spring.application.name=ai-doc-qa
+spring:
+  application:
+    name: ai-doc-qa
+  profiles:
+    active: dev
+

@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+
+  backend:
+    build: ./ai-doc-qa-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_doc_qa
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: hemant@02
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./ai-doc-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: ai_doc_qa
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"

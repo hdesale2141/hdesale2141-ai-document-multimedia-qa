@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > OpenAIService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.hemant.aidocqa.ai</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenAIService (com.hemant.aidocqa.ai)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenAIService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.4%
+  </span>
+  <span class="absValue">
+    (42/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.hemant.aidocqa.ai;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.http.*;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class OpenAIService {
+&nbsp;
+&nbsp;    @Value(&quot;${openai.api.key}&quot;)
+&nbsp;    private String apiKey;
+&nbsp;
+&nbsp;    private final ObjectMapper objectMapper = new ObjectMapper();
+&nbsp;
+&nbsp;    public String generateSummary(String text) {
+&nbsp;
+&nbsp;        try {
+&nbsp;
+<b class="fc">&nbsp;            RestTemplate restTemplate = new RestTemplate();</b>
+&nbsp;
+<b class="fc">&nbsp;            String url = &quot;https://api.groq.com/openai/v1/chat/completions&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;            HttpHeaders headers = new HttpHeaders();</b>
+&nbsp;
+<b class="fc">&nbsp;            headers.setContentType(MediaType.APPLICATION_JSON);</b>
+&nbsp;
+<b class="fc">&nbsp;            headers.setBearerAuth(apiKey);</b>
+&nbsp;
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; requestBody = Map.of(</b>
+&nbsp;                    &quot;model&quot;, &quot;llama-3.1-8b-instant&quot;,
+<b class="fc">&nbsp;                    &quot;messages&quot;, List.of(</b>
+<b class="fc">&nbsp;                            Map.of(</b>
+&nbsp;                                    &quot;role&quot;, &quot;user&quot;,
+&nbsp;                                    &quot;content&quot;, &quot;Summarize the following content in concise bullet points:\n\n&quot; + text
+&nbsp;                            )
+&nbsp;                    ),
+<b class="fc">&nbsp;                    &quot;max_tokens&quot;, 300,</b>
+<b class="fc">&nbsp;                    &quot;temperature&quot;, 0.5</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity =</b>
+&nbsp;                    new HttpEntity&lt;&gt;(requestBody, headers);
+&nbsp;
+<b class="fc">&nbsp;            ResponseEntity&lt;String&gt; response = restTemplate.exchange(</b>
+&nbsp;                    url,
+&nbsp;                    HttpMethod.POST,
+&nbsp;                    entity,
+&nbsp;                    String.class
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            JsonNode jsonNode =</b>
+<b class="fc">&nbsp;                    objectMapper.readTree(response.getBody());</b>
+&nbsp;
+<b class="fc">&nbsp;            return jsonNode</b>
+<b class="fc">&nbsp;                    .get(&quot;choices&quot;)</b>
+<b class="fc">&nbsp;                    .get(0)</b>
+<b class="fc">&nbsp;                    .get(&quot;message&quot;)</b>
+<b class="fc">&nbsp;                    .get(&quot;content&quot;)</b>
+<b class="fc">&nbsp;                    .asText();</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+&nbsp;
+<b class="nc">&nbsp;            return &quot;&quot;&quot;</b>
+&nbsp;        • AI summary generation currently unavailable.
+&nbsp;        • The document was uploaded and processed successfully.
+&nbsp;        • Extracted text is stored in the system.
+&nbsp;        • OpenAI quota limit exceeded during testing.
+&nbsp;        &quot;&quot;&quot;;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String askQuestion(String context, String question) {
+&nbsp;
+&nbsp;        try {
+&nbsp;
+<b class="fc">&nbsp;            RestTemplate restTemplate = new RestTemplate();</b>
+&nbsp;
+<b class="fc">&nbsp;            String url = &quot;https://api.groq.com/openai/v1/chat/completions&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;            HttpHeaders headers = new HttpHeaders();</b>
+&nbsp;
+<b class="fc">&nbsp;            headers.setContentType(MediaType.APPLICATION_JSON);</b>
+&nbsp;
+<b class="fc">&nbsp;            headers.setBearerAuth(apiKey);</b>
+&nbsp;
+<b class="fc">&nbsp;            String prompt = &quot;&quot;&quot;</b>
+&nbsp;                Answer the question based only on the provided context.
+&nbsp;
+&nbsp;                Context:
+&nbsp;                %s
+&nbsp;
+&nbsp;                Question:
+&nbsp;                %s
+<b class="fc">&nbsp;                &quot;&quot;&quot;.formatted(context, question);</b>
+&nbsp;
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; requestBody = Map.of(</b>
+&nbsp;                    &quot;model&quot;, &quot;llama-3.1-8b-instant&quot;,
+<b class="fc">&nbsp;                    &quot;messages&quot;, List.of(</b>
+<b class="fc">&nbsp;                            Map.of(</b>
+&nbsp;                                    &quot;role&quot;, &quot;user&quot;,
+&nbsp;                                    &quot;content&quot;, prompt
+&nbsp;                            )
+&nbsp;                    ),
+<b class="fc">&nbsp;                    &quot;max_tokens&quot;, 300,</b>
+<b class="fc">&nbsp;                    &quot;temperature&quot;, 0.3</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            HttpEntity&lt;Map&lt;String, Object&gt;&gt; entity =</b>
+&nbsp;                    new HttpEntity&lt;&gt;(requestBody, headers);
+&nbsp;
+<b class="fc">&nbsp;            ResponseEntity&lt;String&gt; response = restTemplate.exchange(</b>
+&nbsp;                    url,
+&nbsp;                    HttpMethod.POST,
+&nbsp;                    entity,
+&nbsp;                    String.class
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            JsonNode jsonNode =</b>
+<b class="fc">&nbsp;                    objectMapper.readTree(response.getBody());</b>
+&nbsp;
+<b class="fc">&nbsp;            return jsonNode</b>
+<b class="fc">&nbsp;                    .get(&quot;choices&quot;)</b>
+<b class="fc">&nbsp;                    .get(0)</b>
+<b class="fc">&nbsp;                    .get(&quot;message&quot;)</b>
+<b class="fc">&nbsp;                    .get(&quot;content&quot;)</b>
+<b class="fc">&nbsp;                    .asText();</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return &quot;&quot;&quot;</b>
+&nbsp;                AI response currently unavailable.
+&nbsp;                Question processing pipeline executed successfully.
+&nbsp;                &quot;&quot;&quot;;
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-07 15:54</div>
+</div>
+</body>
+</html>

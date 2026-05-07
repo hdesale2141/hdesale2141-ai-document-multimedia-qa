@@ -1,0 +1,307 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > WhisperService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.hemant.aidocqa.ai</a>
+</div>
+
+<h1>Coverage Summary for Class: WhisperService (com.hemant.aidocqa.ai)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WhisperService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.9%
+  </span>
+  <span class="absValue">
+    (38/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.hemant.aidocqa.ai;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.http.*;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class WhisperService {
+&nbsp;
+&nbsp;    @Value(&quot;${assemblyai.api.key}&quot;)
+&nbsp;    private String apiKey;
+&nbsp;
+&nbsp;    private final ObjectMapper objectMapper =
+&nbsp;            new ObjectMapper();
+&nbsp;
+&nbsp;    public List&lt;Map&lt;String, Object&gt;&gt; transcribe(
+&nbsp;            String filePath
+&nbsp;    ) {
+&nbsp;
+&nbsp;        try {
+&nbsp;
+<b class="fc">&nbsp;            RestTemplate restTemplate =</b>
+&nbsp;                    new RestTemplate();
+&nbsp;
+<b class="fc">&nbsp;            File file = new File(filePath);</b>
+&nbsp;
+<b class="fc">&nbsp;            byte[] fileBytes =</b>
+<b class="fc">&nbsp;                    Files.readAllBytes(file.toPath());</b>
+&nbsp;
+<b class="fc">&nbsp;            HttpHeaders uploadHeaders =</b>
+&nbsp;                    new HttpHeaders();
+&nbsp;
+<b class="fc">&nbsp;            uploadHeaders.set(</b>
+&nbsp;                    &quot;authorization&quot;,
+&nbsp;                    apiKey
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            uploadHeaders.setContentType(</b>
+&nbsp;                    MediaType.APPLICATION_OCTET_STREAM
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            HttpEntity&lt;byte[]&gt; uploadEntity =</b>
+&nbsp;                    new HttpEntity&lt;&gt;(
+&nbsp;                            fileBytes,
+&nbsp;                            uploadHeaders
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            ResponseEntity&lt;String&gt; uploadResponse =</b>
+<b class="fc">&nbsp;                    restTemplate.exchange(</b>
+&nbsp;                            &quot;https://api.assemblyai.com/v2/upload&quot;,
+&nbsp;                            HttpMethod.POST,
+&nbsp;                            uploadEntity,
+&nbsp;                            String.class
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            JsonNode uploadJson =</b>
+<b class="fc">&nbsp;                    objectMapper.readTree(</b>
+<b class="fc">&nbsp;                            uploadResponse.getBody()</b>
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            String audioUrl =</b>
+<b class="fc">&nbsp;                    uploadJson.get(&quot;upload_url&quot;)</b>
+<b class="fc">&nbsp;                            .asText();</b>
+&nbsp;
+<b class="fc">&nbsp;            HttpHeaders transcriptHeaders =</b>
+&nbsp;                    new HttpHeaders();
+&nbsp;
+<b class="fc">&nbsp;            transcriptHeaders.set(</b>
+&nbsp;                    &quot;authorization&quot;,
+&nbsp;                    apiKey
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            transcriptHeaders.setContentType(</b>
+&nbsp;                    MediaType.APPLICATION_JSON
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; transcriptRequest =</b>
+<b class="fc">&nbsp;                    Map.of(</b>
+&nbsp;                            &quot;audio_url&quot;, audioUrl,
+&nbsp;                            &quot;speech_models&quot;,
+<b class="fc">&nbsp;                            List.of(</b>
+<b class="fc">&nbsp;                                    Map.of(</b>
+&nbsp;                                            &quot;speech_model&quot;,
+&nbsp;                                            &quot;universal&quot;
+&nbsp;                                    )
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+&nbsp;            HttpEntity&lt;Map&lt;String, Object&gt;&gt;
+<b class="fc">&nbsp;                    transcriptEntity =</b>
+&nbsp;                    new HttpEntity&lt;&gt;(
+&nbsp;                            transcriptRequest,
+&nbsp;                            transcriptHeaders
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            ResponseEntity&lt;String&gt; transcriptResponse =</b>
+<b class="fc">&nbsp;                    restTemplate.exchange(</b>
+&nbsp;                            &quot;https://api.assemblyai.com/v2/transcript&quot;,
+&nbsp;                            HttpMethod.POST,
+&nbsp;                            transcriptEntity,
+&nbsp;                            String.class
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            JsonNode transcriptJson =</b>
+<b class="nc">&nbsp;                    objectMapper.readTree(</b>
+<b class="nc">&nbsp;                            transcriptResponse.getBody()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            String transcriptId =</b>
+<b class="nc">&nbsp;                    transcriptJson.get(&quot;id&quot;)</b>
+<b class="nc">&nbsp;                            .asText();</b>
+&nbsp;
+&nbsp;            JsonNode pollingJson;
+&nbsp;
+&nbsp;            while (true) {
+&nbsp;
+<b class="nc">&nbsp;                Thread.sleep(5000);</b>
+&nbsp;
+<b class="nc">&nbsp;                ResponseEntity&lt;String&gt; pollingResponse =</b>
+<b class="nc">&nbsp;                        restTemplate.exchange(</b>
+&nbsp;                                &quot;https://api.assemblyai.com/v2/transcript/&quot;
+&nbsp;                                        + transcriptId,
+&nbsp;                                HttpMethod.GET,
+&nbsp;                                new HttpEntity&lt;&gt;(transcriptHeaders),
+&nbsp;                                String.class
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                pollingJson =</b>
+<b class="nc">&nbsp;                        objectMapper.readTree(</b>
+<b class="nc">&nbsp;                                pollingResponse.getBody()</b>
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                String status =</b>
+<b class="nc">&nbsp;                        pollingJson.get(&quot;status&quot;).asText();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (status.equals(&quot;completed&quot;)) {</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (status.equals(&quot;error&quot;)) {</b>
+<b class="nc">&nbsp;                    throw new RuntimeException(</b>
+&nbsp;                            &quot;AssemblyAI transcription failed.&quot;
+&nbsp;                    );
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            JsonNode words =</b>
+<b class="nc">&nbsp;                    pollingJson.get(&quot;words&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;Map&lt;String, Object&gt;&gt; segments =</b>
+&nbsp;                    new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;            for (JsonNode word : words) {</b>
+&nbsp;
+<b class="nc">&nbsp;                segments.add(</b>
+<b class="nc">&nbsp;                        Map.of(</b>
+&nbsp;                                &quot;start&quot;,
+<b class="nc">&nbsp;                                word.get(&quot;start&quot;).asDouble() / 1000,</b>
+&nbsp;                                &quot;end&quot;,
+<b class="nc">&nbsp;                                word.get(&quot;end&quot;).asDouble() / 1000,</b>
+&nbsp;                                &quot;text&quot;,
+<b class="nc">&nbsp;                                word.get(&quot;text&quot;).asText()</b>
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            return segments;</b>
+&nbsp;
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+&nbsp;
+<b class="fc">&nbsp;            return List.of(</b>
+<b class="fc">&nbsp;                    Map.of(</b>
+<b class="fc">&nbsp;                            &quot;start&quot;, 0,</b>
+<b class="fc">&nbsp;                            &quot;end&quot;, 20,</b>
+&nbsp;                            &quot;text&quot;,
+&nbsp;                            &quot;Introduction section&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Map.of(</b>
+<b class="fc">&nbsp;                            &quot;start&quot;, 21,</b>
+<b class="fc">&nbsp;                            &quot;end&quot;, 45,</b>
+&nbsp;                            &quot;text&quot;,
+&nbsp;                            &quot;Machine learning concepts&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Map.of(</b>
+<b class="fc">&nbsp;                            &quot;start&quot;, 46,</b>
+<b class="fc">&nbsp;                            &quot;end&quot;, 90,</b>
+&nbsp;                            &quot;text&quot;,
+&nbsp;                            &quot;Deep learning discussion&quot;
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-07 15:54</div>
+</div>
+</body>
+</html>
